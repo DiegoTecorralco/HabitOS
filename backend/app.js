@@ -3,28 +3,36 @@ import cors from "cors";
 import mongoose from "mongoose";
 import morgan from "morgan";
 import dotenv from "dotenv";
-import jwt from "jsonwebtoken";
 import helmet from "helmet";
+import userRouter from "./routes/userRoutes.js";
+
+dotenv.config();
 
 const app = express();
 
-//MIDDLEWARES
+// MIDDLEWARES
 app.use(express.json());
-dotenv.config();
 app.use(helmet());
 app.use(cors());
 app.use(morgan("dev"));
 
-//SETTINGS
+// SETTINGS
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
 
-//ROUTES
-app.route("/api/user");
-app.route("/api/routine");
-app.route("/api/goal");
+// MONGODB
+mongoose
+  .connect(process.env.MONGO_URI)
+  .then(() => console.log("MongoDB connected"))
+  .catch((error) => {
+    console.error("MongoDB connection error:", error.message);
+    process.exit(1);
+  });
+
+// ROUTES
+app.use("/api/user", userRouter);
 
 export default app;
